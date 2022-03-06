@@ -47,9 +47,29 @@ def rotation():
             yprime = x*-1 + y*0
             matriceRota[xprime][yprime] = matriceImg[x][y]
 
-    mpimg.imsave("goldhill_transformed.png", matriceRota)
+    mpimg.imsave("goldhill_rotated.png", matriceRota)
 
     return matriceRota
+
+def filtre(imageBruit):
+    fe = 1600
+    N1, Wn1 = signal.buttord(500, 750, 0.2, 60, fs=fe)
+    print("Butterworth : " + str(N1))
+
+    N2, Wn2 = signal.cheb1ord(500, 750, 0.2, 60, fs=fe)
+    print("Chebyshev type I : " + str(N2))
+
+    N3, Wn3 = signal.cheb2ord(500, 750, 0.2, 60, fs=fe)
+    print("Chebyshev type II : " + str(N3))
+
+    N4, Wn4 = signal.ellipord(500, 750, 0.2, 60, fs=fe)
+    print("Elliptique : " + str(N4))
+
+    b, a = signal.ellip(N4, 0.2, 60, Wn4, fs=fe)
+
+    image = signal.lfilter(b, a, imageBruit)
+
+    mpimg.imsave("goldhill_without_sound.png", image)
 
 
 def main():
@@ -60,3 +80,6 @@ def main():
 if __name__ == '__main__':
     plt.gray()
     main()
+
+    img = np.load("goldhill_bruit.npy")
+    filtre(img)
