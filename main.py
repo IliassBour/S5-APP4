@@ -6,7 +6,7 @@ import zplane as zp
 
 
 def lireImage():
-    img = np.load("goldhill_aberrations.npy")
+    img = np.load("goldhill_bruit.npy")
     return img
 
 
@@ -51,7 +51,7 @@ def rotation():
 
     return matriceRota
 
-def filtre(imageBruit):
+def bruitFiltre(imageBruit):
     fe = 1600
     N1, Wn1 = signal.buttord(500, 750, 0.2, 60, fs=fe)
     print("Butterworth : " + str(N1))
@@ -72,9 +72,25 @@ def filtre(imageBruit):
     mpimg.imsave("goldhill_without_sound.png", image)
 
 
+def bruitBilineaire(img):
+    wc_d = 500 #Fréquence de coupure
+    wc = 4789 #Fréquence de coupure selon gauchissement des fréquences
+    fe = 1600 #Fréquence d'échantillonnage
+    H_s = lambda s: 1 / (pow(s/wc, 2) + np.sqrt(2)*(s/wc) + 1)
+    H_z = lambda z: H_s(2*fe*(z-1)/(z+1))
+
+    coeff_num = [0.42, 0.84, 0.42]
+    coeff_denum = [1, 0.46, 0.21]
+
+    img = signal.lfilter(coeff_num, coeff_denum, img, axis=1)
+
+    return img
+
+
 def main():
     image = lireImage()
-    image = retirerAberrations(image)
+    #image = retirerAberrations(image)
+    image = bruitBilineaire(image)
     mpimg.imsave("goldhill_transformed.png", image)
 
 if __name__ == '__main__':
@@ -82,4 +98,4 @@ if __name__ == '__main__':
     main()
 
     img = np.load("goldhill_bruit.npy")
-    filtre(img)
+    bruitFiltre(img)
