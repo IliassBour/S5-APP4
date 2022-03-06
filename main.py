@@ -15,12 +15,13 @@ def retirerAberrations(img):
     z_1 = 0
     z_2 = -0.99
     z_3 = 0.8
+    z_4 = -0.99
     p_1 = 0.9 * pow(np.e, 1j * np.pi / 2)
     p_2 = 0.9 * pow(np.e, -1j * np.pi / 2)
     p_3 = 0.95 * pow(np.e, 1j * np.pi / 8)
     p_4 = 0.95 * pow(np.e, -1j * np.pi / 8)
 
-    coeff_num = np.poly([z_1, z_2, z_3])
+    coeff_num = np.poly([z_1, z_2, z_3, z_4])
     coeff_denum = np.poly([p_1, p_2, p_3, p_4])
 
     #zp.zplane(coeff_num, coeff_denum)
