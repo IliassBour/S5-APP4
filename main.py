@@ -31,11 +31,6 @@ def retirerAberrations(img):
     return img
 
 
-def main():
-    image = lireImage()
-    image = retirerAberrations(image)
-    mpimg.imsave("goldhill_transformed.png", image)
-
 def rotation():
 
     plt.gray()
@@ -55,6 +50,12 @@ def rotation():
     mpimg.imsave("goldhill_transformed.png", matriceRota)
 
     return matriceRota
+
+
+def main():
+    image = lireImage()
+    image = retirerAberrations(image)
+    mpimg.imsave("goldhill_transformed.png", image)
 
 if __name__ == '__main__':
     plt.gray()
