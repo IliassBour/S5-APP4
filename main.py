@@ -71,6 +71,13 @@ def filtre(imageBruit):
 
     mpimg.imsave("goldhill_without_sound.png", image)
 
+def compression():
+    #matrice
+    #conv
+
+    #eigne value et vector
+    #numpy.linalg.eig
+    return 0
 
 def main():
     image = lireImage()
@@ -81,5 +88,5 @@ if __name__ == '__main__':
     plt.gray()
     main()
 
-    img = np.load("goldhill_bruit.npy")
-    filtre(img)
+    #img = np.load("goldhill_bruit.npy")
+    #filtre(img)
