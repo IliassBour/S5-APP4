@@ -5,8 +5,8 @@ from scipy import signal
 import zplane as zp
 
 
-def lireImage():
-    img = np.load("goldhill_bruit.npy")
+def lireImage(img_name):
+    img = np.load(img_name)
     return img
 
 
@@ -31,23 +31,27 @@ def retirerAberrations(img):
     return img
 
 
-def rotation():
+def rotation(img):
 
-    plt.gray()
-    matriceImg = mpimg.imread('goldhill_rotate.png')
+    #plt.gray()
+    #matriceImg = mpimg.imread('goldhill_rotate.png')
 
     #Application de la matrice de rotation
-    matriceRota =  np.ndarray((512, 512, 4))
+    x_size = len(img)
+    y_size = len(img[0])
+    matriceRota = np.ndarray((x_size, y_size)) #512x512, 4
 
     xprime = []
     yprime = []
-    for x in range(512):
-        for y in range(512):
+    print(x_size)
+    print(y_size)
+    for x in range(x_size):
+        for y in range(y_size):
             xprime = x*0 + y*1
             yprime = x*-1 + y*0
-            matriceRota[xprime][yprime] = matriceImg[x][y]
+            matriceRota[xprime][yprime] = img[x][y] #matriceImg
 
-    mpimg.imsave("goldhill_rotated.png", matriceRota)
+    #mpimg.imsave("goldhill_rotated.png", matriceRota)
 
     return matriceRota
 
@@ -95,10 +99,11 @@ def bruitBilineaire(img):
 
 
 def main():
-    image = lireImage()
-    #image = retirerAberrations(image)
+    image = lireImage("image_complete.npy")
+    image = retirerAberrations(image)
+    image = rotation(image)
     image = bruitBilineaire(image)
-    mpimg.imsave("goldhill_transformed.png", image)
+    mpimg.imsave("chaton.png", image)
 
 if __name__ == '__main__':
     plt.gray()
