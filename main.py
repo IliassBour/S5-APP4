@@ -47,21 +47,22 @@ def rotation(img):
     #Application de la matrice de rotation
     x_size = len(img)
     y_size = len(img[0])
-    matriceRota = np.ndarray((x_size, y_size)) #512x512, 4
+    imgTourner = np.ndarray((x_size, y_size)) #512x512, 4
 
+    matricePassage = np.array([[0, -1], [1, 0]])
     for x in range(x_size):
         for y in range(y_size):
-            xprime = x*0 + y*1
-            yprime = x*-1 + y*0
-            matriceRota[xprime][yprime] = img[x][y] #matriceImg
+            coordonner = np.array([[x], [y]])
+            matriceRotation = np.matmul(matricePassage.T, coordonner)
+            imgTourner[matriceRotation[0][0]][matriceRotation[1][0]] = img[x][y] #matriceImg
 
     plt.figure("Image avant rotation")
     plt.imshow(img, cmap="gray")
     plt.figure("Image après rotation")
-    plt.imshow(matriceRota, cmap="gray")
+    plt.imshow(imgTourner, cmap="gray")
     plt.show()
 
-    return matriceRota
+    return imgTourner
 
 def bruitBilineaire(img):
     wc_d = 500 #Fréquence de coupure
