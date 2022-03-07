@@ -152,16 +152,24 @@ def main():
     image_bil = bruitBilineaire(image)
     image_pyth = bruitFiltre(image)
 
+    imgCompresser50, eigVector50 = compression(image_bil, 50)
+    imgDecompresser50 = decompression(imgCompresser50, eigVector50)
+    imgCompresser70, eigVector70 = compression(image_bil, 70)
+    imgDecompresser70 = decompression(imgCompresser70, eigVector70)
+
     plt.figure("Image débruitée avec méthode bilinéaire")
     plt.imshow(image_bil, cmap="gray")
 
     plt.figure("Image débruitée avec méthode python")
     plt.imshow(image_pyth, cmap="gray")
-    plt.show()
 
-    imgCompresser, eigVector = compression(image, 75)
-    imgDecompresser = decompression(imgCompresser, eigVector)
-    mpimg.imsave("chaton_decomp.png", imgDecompresser)
+    plt.figure("Image décompréssée, 50%")
+    plt.imshow(imgDecompresser50, cmap="gray")
+
+    plt.figure("Image décompréssée, 70%")
+    plt.imshow(imgDecompresser70, cmap="gray")
+
+    plt.show()
 
 if __name__ == '__main__':
     plt.gray()
