@@ -2,7 +2,6 @@
 ###     Iliass Bourabaa (boui2215)
 ###     Pedro Maria Scoccimarro (scop2401)
 ###
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -89,7 +88,7 @@ def bruitBilineaire(img):
     return img
 
 def bruitFiltre(imageBruit):
-    fe = 1600
+    fe = 1600 #fréquence d'échantillonnage
     N1, Wn1 = signal.buttord(500, 750, 0.2, 60, fs=fe)
     print("Butterworth : " + str(N1))
 
@@ -119,17 +118,12 @@ def bruitFiltre(imageBruit):
     return image
 
 def compression(image, pourcentage):
-    #matrice
-    matriceCov = np.cov(image)
-
-    #eigne value et vector
+    matriceCov = np.cov(image) #matrice de covariance
     eigVal, eigVect = np.linalg.eig(matriceCov)
-
-    # matriceComp = eigVect*image
     imgComp = np.matmul(eigVect.T, image)
 
+    #Compression de l'image
     nbLigne = int(len(imgComp)*(100-pourcentage)/100)
-
     for x in range(len(imgComp)):
          if x >= nbLigne:
             for y in range(len(imgComp[0])):
@@ -139,12 +133,9 @@ def compression(image, pourcentage):
 
 def decompression(image, eigVector):
     invEigVect = np.linalg.inv(eigVector)
-
     imgDecomp = np.matmul(invEigVect.T, image)
 
     return imgDecomp
-
-
 
 def main():
     image = lireImage("image_complete.npy")
