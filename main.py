@@ -1,3 +1,7 @@
+### Auteurs:
+###     Iliass Bourabaa (boui2215)
+###     Pedro Maria Scoccimarro (scop2401)
+###
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,36 +28,64 @@ def retirerAberrations(img):
     coeff_num = np.poly([z_1, z_2, z_3, z_4])
     coeff_denum = np.poly([p_1, p_2, p_3, p_4])
 
-    #zp.zplane(coeff_num, coeff_denum)
+    plt.title("Pôles et Zéros pour abérrations")
+    zp.zplane(coeff_num, coeff_denum)
+
+    plt.figure("Image avec abérrations")
+    plt.imshow(img, cmap="gray")
 
     img = signal.lfilter(coeff_num, coeff_denum, img, axis=1)
+
+    plt.figure("Image sans abérrations")
+    plt.imshow(img, cmap="gray")
+    plt.show()
 
     return img
 
 
 def rotation(img):
-
-    #plt.gray()
-    #matriceImg = mpimg.imread('goldhill_rotate.png')
-
     #Application de la matrice de rotation
     x_size = len(img)
     y_size = len(img[0])
     matriceRota = np.ndarray((x_size, y_size)) #512x512, 4
 
-    xprime = []
-    yprime = []
-    print(x_size)
-    print(y_size)
     for x in range(x_size):
         for y in range(y_size):
             xprime = x*0 + y*1
             yprime = x*-1 + y*0
             matriceRota[xprime][yprime] = img[x][y] #matriceImg
 
-    #mpimg.imsave("goldhill_rotated.png", matriceRota)
+    plt.figure("Image avant rotation")
+    plt.imshow(img, cmap="gray")
+    plt.figure("Image après rotation")
+    plt.imshow(matriceRota, cmap="gray")
+    plt.show()
 
     return matriceRota
+
+def bruitBilineaire(img):
+    wc_d = 500 #Fréquence de coupure
+    wc = 4789 #Fréquence de coupure selon gauchissement des fréquences
+    fe = 1600 #Fréquence d'échantillonnage
+    H_s = lambda s: 1 / (pow(s/wc, 2) + np.sqrt(2)*(s/wc) + 1)
+    H_z = lambda z: H_s(2*fe*(z-1)/(z+1))
+
+    coeff_num = [0.42, 0.84, 0.42]
+    coeff_denum = [1, 0.46, 0.21]
+
+    img = signal.lfilter(coeff_num, coeff_denum, img, axis=1)
+
+    plt.title("Pôles et Zéros méthode bilinéaire")
+    zp.zplane(coeff_num, coeff_denum)
+
+    w, h = signal.freqz(coeff_num, coeff_denum)
+    plt.figure("Reponse fréquentielle bilinéaire")
+    plt.plot(w, 20 * np.log10(np.abs(h)))
+    plt.ylabel("Fréquence (dB)")
+    plt.xlabel("w")
+    plt.show()
+
+    return img
 
 def bruitFiltre(imageBruit):
     fe = 1600
@@ -69,11 +101,21 @@ def bruitFiltre(imageBruit):
     N4, Wn4 = signal.ellipord(500, 750, 0.2, 60, fs=fe)
     print("Elliptique : " + str(N4))
 
-    b, a = signal.ellip(N4, 0.2, 60, Wn4, fs=fe)
+    coeff_num, coeff_denum = signal.ellip(N4, 0.2, 60, Wn4, fs=fe)
 
-    image = signal.lfilter(b, a, imageBruit)
+    image = signal.lfilter(coeff_num, coeff_denum, imageBruit)
 
-    mpimg.imsave("goldhill_without_sound.png", image)
+    plt.title("Pôles et Zéros méthode python (Elliptique)")
+    zp.zplane(coeff_num, coeff_denum)
+
+    w, h = signal.freqz(coeff_num, coeff_denum)
+    plt.figure("Reponse fréquentielle bilinéaire")
+    plt.plot(w, 20 * np.log10(np.abs(h)))
+    plt.ylabel("Fréquence (dB)")
+    plt.xlabel("w")
+    plt.show()
+
+    return image
 
 def compression():
     #matrice
@@ -83,31 +125,21 @@ def compression():
     #numpy.linalg.eig
     return 0
 
-def bruitBilineaire(img):
-    wc_d = 500 #Fréquence de coupure
-    wc = 4789 #Fréquence de coupure selon gauchissement des fréquences
-    fe = 1600 #Fréquence d'échantillonnage
-    H_s = lambda s: 1 / (pow(s/wc, 2) + np.sqrt(2)*(s/wc) + 1)
-    H_z = lambda z: H_s(2*fe*(z-1)/(z+1))
-
-    coeff_num = [0.42, 0.84, 0.42]
-    coeff_denum = [1, 0.46, 0.21]
-
-    img = signal.lfilter(coeff_num, coeff_denum, img, axis=1)
-
-    return img
-
 
 def main():
     image = lireImage("image_complete.npy")
     image = retirerAberrations(image)
     image = rotation(image)
-    image = bruitBilineaire(image)
-    mpimg.imsave("chaton.png", image)
+    image_bil = bruitBilineaire(image)
+    image_pyth = bruitFiltre(image)
+
+    plt.figure("Image débruitée avec méthode bilinéaire")
+    plt.imshow(image_bil, cmap="gray")
+
+    plt.figure("Image débruitée avec méthode python")
+    plt.imshow(image_pyth, cmap="gray")
+    plt.show()
 
 if __name__ == '__main__':
     plt.gray()
     main()
-
-    #img = np.load("goldhill_bruit.npy")
-    #filtre(img)
