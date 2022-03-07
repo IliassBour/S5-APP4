@@ -117,13 +117,32 @@ def bruitFiltre(imageBruit):
 
     return image
 
-def compression():
+def compression(image, pourcentage):
     #matrice
-    #conv
+    matriceCov = np.cov(image)
 
     #eigne value et vector
-    #numpy.linalg.eig
-    return 0
+    eigVal, eigVect = np.linalg.eig(matriceCov)
+
+    # matriceComp = eigVect*image
+    imgComp = np.matmul(eigVect.T, image)
+
+    nbLigne = int(len(imgComp)*(100-pourcentage)/100)
+
+    for x in range(len(imgComp)):
+         if x >= nbLigne:
+            for y in range(len(imgComp[0])):
+                imgComp[x][y] = 0
+
+    return imgComp, eigVect
+
+def decompression(image, eigVector):
+    invEigVect = np.linalg.inv(eigVector)
+
+    imgDecomp = np.matmul(invEigVect.T, image)
+
+    return imgDecomp
+
 
 
 def main():
@@ -139,6 +158,10 @@ def main():
     plt.figure("Image débruitée avec méthode python")
     plt.imshow(image_pyth, cmap="gray")
     plt.show()
+
+    imgCompresser, eigVector = compression(image, 75)
+    imgDecompresser = decompression(imgCompresser, eigVector)
+    mpimg.imsave("chaton_decomp.png", imgDecompresser)
 
 if __name__ == '__main__':
     plt.gray()
